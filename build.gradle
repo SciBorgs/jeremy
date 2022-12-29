@@ -4,6 +4,7 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
     id "org.jetbrains.kotlin.jvm" version "1.6.10"
+    id "com.diffplug.spotless" version "6.1.0"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -70,6 +71,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    implementation "com.github.Oblarg:Oblog:5.1.0"
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -92,6 +95,7 @@ wpi.java.configureTestTasks(test)
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 compileKotlin {
@@ -103,5 +107,51 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "11"
+    }
+}
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlin {
+        ktfmt()
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
     }
 }
